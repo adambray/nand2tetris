@@ -1,0 +1,28 @@
+/**
+ * Program Counter Chip with logic controlling jumps, loads, and and reset
+ */
+
+CHIP FullPCWithJump {
+    IN  address[16],     // Address to load when JMP is to be performed
+        instruction[3],  // Relevant 3 bits from Hack machine code instruction
+        zr,              // results of ALU computation (zero)
+        ng,              // results of ALU computation (negative)
+        reset;           // Signals whether to re-start the current
+                         // program (reset==1) or continue executing
+                         // the current program (reset==0).
+    OUT pc[15];          // next address
+
+    PARTS:
+    Or(a=ng, b=zr, out=notPos);
+    Not(in=notPos, out=pos);
+
+    And(a=instruction[2], b=ng, out=jmp1);
+    And(a=instruction[1], b=zr, out=jmp2);
+    And(a=instruction[0], b=pos, out=jmp3);
+
+    Or(a=jmp1, b=jmp2, out=jmpA);
+    Or(a=jmp3, b=false, out=jmpB);
+    Or(a=jmpA, b=jmpB, out=JMP);
+
+    PC(load=JMP, inc=true, reset=reset, in=address, out[15]=dummy, out[0..14]=pc);
+}

@@ -1,0 +1,33 @@
+/**
+ * Splits instruction into sub-components to simplify development
+ * of other parts of CPU
+ */
+
+CHIP Decode {
+    IN  instruction[16]; // Instruction to decode
+    OUT cType,
+        cAMSelect,
+        zx,
+        zy,
+        nx,
+        ny,
+        f,
+        no,
+        cLoadA,
+        cLoadD,
+        cLoadM,
+        cJump[3];
+
+    PARTS:
+    Mux16(a=false, a[5]=true, b=instruction, sel=instruction[15],
+          out[15]=cType,
+          out[12]=cAMSelect,
+          out[11]=zx,
+          out[10]=nx,
+          out[9]=zy,
+          out[8]=ny,
+          out[7]=f,
+          out[6]=no,
+          out[5]=cLoadA,
+          out[4]=cLoadD, out[3]=cLoadM, out[0..2]=cJump);
+}

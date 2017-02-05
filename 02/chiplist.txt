@@ -1,0 +1,7 @@
+HalfAdder	                Half Adder
+FullAdder	                Full Adder
+Add16	                    16-bit Adder
+Inc16	                    16-bit incrementer
+
+ALU	Arithmetic Logic Unit (without handling of status outputs)
+ALU	Arithmetic Logic Unit (complete)

@@ -1,0 +1,83 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/03/a/Register.hdl
+
+/**
+ * 16-bit register:
+ * If load[t] == 1 then out[t+1] = in[t]
+ * else out does not change
+ */
+
+CHIP Register {
+    IN in[16], load;
+    OUT out[16];
+
+    PARTS:
+    DFF(in=muxout0,  out=dffout0);
+    DFF(in=muxout1,  out=dffout1);
+    DFF(in=muxout2,  out=dffout2);
+    DFF(in=muxout3,  out=dffout3);
+    DFF(in=muxout4,  out=dffout4);
+    DFF(in=muxout5,  out=dffout5);
+    DFF(in=muxout6,  out=dffout6);
+    DFF(in=muxout7,  out=dffout7);
+    DFF(in=muxout8,  out=dffout8);
+    DFF(in=muxout9,  out=dffout9);
+    DFF(in=muxout10, out=dffout10);
+    DFF(in=muxout11, out=dffout11);
+    DFF(in=muxout12, out=dffout12);
+    DFF(in=muxout13, out=dffout13);
+    DFF(in=muxout14, out=dffout14);
+    DFF(in=muxout15, out=dffout15);
+    Mux16(a[0]=dffout0,
+          a[1]=dffout1,
+          a[2]=dffout2,
+          a[3]=dffout3,
+          a[4]=dffout4,
+          a[5]=dffout5,
+          a[6]=dffout6,
+          a[7]=dffout7,
+          a[8]=dffout8,
+          a[9]=dffout9,
+          a[10]=dffout10,
+          a[11]=dffout11,
+          a[12]=dffout12,
+          a[13]=dffout13,
+          a[14]=dffout14,
+          a[15]=dffout15,
+          b=in, sel=load,
+          out[0]=muxout0,
+          out[1]=muxout1,
+          out[2]=muxout2,
+          out[3]=muxout3,
+          out[4]=muxout4,
+          out[5]=muxout5,
+          out[6]=muxout6,
+          out[7]=muxout7,
+          out[8]=muxout8,
+          out[9]=muxout9,
+          out[10]=muxout10,
+          out[11]=muxout11,
+          out[12]=muxout12,
+          out[13]=muxout13,
+          out[14]=muxout14,
+          out[15]=muxout15);
+    Or(a=false, b=dffout0,  out=out[0]);
+    Or(a=false, b=dffout1,  out=out[1]);
+    Or(a=false, b=dffout2,  out=out[2]);
+    Or(a=false, b=dffout3,  out=out[3]);
+    Or(a=false, b=dffout4,  out=out[4]);
+    Or(a=false, b=dffout5,  out=out[5]);
+    Or(a=false, b=dffout6,  out=out[6]);
+    Or(a=false, b=dffout7,  out=out[7]);
+    Or(a=false, b=dffout8,  out=out[8]);
+    Or(a=false, b=dffout9,  out=out[9]);
+    Or(a=false, b=dffout10, out=out[10]);
+    Or(a=false, b=dffout11, out=out[11]);
+    Or(a=false, b=dffout12, out=out[12]);
+    Or(a=false, b=dffout13, out=out[13]);
+    Or(a=false, b=dffout14, out=out[14]);
+    Or(a=false, b=dffout15, out=out[15]);
+
+}
