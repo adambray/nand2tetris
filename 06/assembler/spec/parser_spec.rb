@@ -26,6 +26,28 @@ describe 'Parser' do
     end
   end
 
+    describe '#advance' do
+      it 'moves to the next command' do
+        parser = get_parser([A_COMMAND, C_COMMAND, L_COMMAND])
+
+        expect(parser.command_type).to eq(:a_command)
+        parser.advance
+        expect(parser.command_type).to eq(:c_command)
+        parser.advance
+        expect(parser.command_type).to eq(:l_command)
+      end
+
+      it 'moves skips comments and empty lines' do
+        parser = get_parser([A_COMMAND, COMMENT, BLANK_LINE, COMMENT, C_COMMAND, L_COMMAND])
+
+        expect(parser.command_type).to eq(:a_command)
+        parser.advance
+        expect(parser.command_type).to eq(:c_command)
+        parser.advance
+        expect(parser.command_type).to eq(:l_command)
+      end
+    end
+
   describe '#has_more_commands?' do
     it 'returns true when the file has more commands' do
       parser = get_parser([A_COMMAND, C_COMMAND, L_COMMAND])
@@ -43,28 +65,6 @@ describe 'Parser' do
       expect(parser.has_more_commands?).to be_truthy
       parser.advance
       expect(parser.has_more_commands?).to be_falsey
-    end
-  end
-
-  describe '#advance' do
-    it 'moves to the next command' do
-      parser = get_parser([A_COMMAND, C_COMMAND, L_COMMAND])
-
-      expect(parser.command_type).to eq(:a_command)
-      parser.advance
-      expect(parser.command_type).to eq(:c_command)
-      parser.advance
-      expect(parser.command_type).to eq(:l_command)
-    end
-
-    it 'moves skips comments and empty lines' do
-      parser = get_parser([A_COMMAND, COMMENT, BLANK_LINE, COMMENT, C_COMMAND, L_COMMAND])
-
-      expect(parser.command_type).to eq(:a_command)
-      parser.advance
-      expect(parser.command_type).to eq(:c_command)
-      parser.advance
-      expect(parser.command_type).to eq(:l_command)
     end
   end
 
@@ -92,6 +92,14 @@ describe 'Parser' do
       parser = get_parser(["AMD=D+1;JMP"])
       expect(parser.dest).to eq("AMD")
     end
+
+    it 'ignores comments on the same line' do
+      parser = get_parser(["D+1;JMP    // some comment"])
+      expect(parser.dest).to eq(nil)
+
+      parser = get_parser(["AMD=D+1;JMP // some comment"])
+      expect(parser.dest).to eq("AMD")
+    end
   end
 
   describe '#comp' do
@@ -114,6 +122,26 @@ describe 'Parser' do
       parser = get_parser(["D|M"])
       expect(parser.comp).to eq("D|M")
     end
+
+    it 'ignores comments on the same line' do
+      parser = get_parser(["D=D+1;JMP  // comment"])
+      expect(parser.comp).to eq("D+1")
+
+      parser = get_parser(["AMD=D+1//comment"])
+      expect(parser.comp).to eq("D+1")
+
+      parser = get_parser(["AMD=0;JLE //comment"])
+      expect(parser.comp).to eq("0")
+
+      parser = get_parser(["AMD=-1 //comment"])
+      expect(parser.comp).to eq("-1")
+
+      parser = get_parser(["AMD=-M //comment"])
+      expect(parser.comp).to eq("-M")
+
+      parser = get_parser(["D|M //comment"])
+      expect(parser.comp).to eq("D|M")
+    end
   end
 
   describe '#jump' do
@@ -128,6 +156,19 @@ describe 'Parser' do
       expect(parser.jump).to eq("JLE")
 
       parser = get_parser(["AMD=-1"])
+      expect(parser.jump).to eq(nil)
+    end
+    it 'ignores comments on the same line' do
+      parser = get_parser(["D=D+1;JMP//comment"])
+      expect(parser.jump).to eq("JMP")
+
+      parser = get_parser(["AMD=D+1 //comment"])
+      expect(parser.jump).to eq(nil)
+
+      parser = get_parser(["AMD=0;JLE //comment"])
+      expect(parser.jump).to eq("JLE")
+
+      parser = get_parser(["AMD=-1 //some comment"])
       expect(parser.jump).to eq(nil)
     end
   end

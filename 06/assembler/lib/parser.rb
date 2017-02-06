@@ -77,7 +77,12 @@ class Parser
   end
 
   def current_command
-    return @lines[@current_line].chomp.strip
+    command = @lines[@current_line].chomp.strip
+    if command.include?("//")
+      return command.split("//").first.strip
+    else
+      return command
+    end
   end
 
   private
