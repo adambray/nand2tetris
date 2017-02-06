@@ -3,10 +3,25 @@ class Parser
     @file = file
     @lines = file.readlines
     @current_line = 0
+
+    @lines = [""] if @lines.empty?
+    advance if !is_statement?
   end
 
   def advance
+    on_last_line = @current_line == @lines.length - 1
+    return false if on_last_line
+
     @current_line += 1
+    is_statement? ? (return true) : advance
+  end
+
+  def has_more_commands?
+    original_line = @current_line
+    can_advance = advance
+    @current_line = original_line
+
+    return can_advance
   end
 
   def command_type
@@ -16,17 +31,9 @@ class Parser
       return :l_command
     elsif first_char == "@"
       return :a_command
-    elsif current_command[0] == "/" && current_command[1] == "/"
-      return :comment
-    elsif current_command == ""
-      return :empty
     else
       return :c_command
     end
-  end
-
-  def has_more_commands?
-    return @lines.length > @current_line + 1
   end
 
   def symbol
@@ -71,5 +78,13 @@ class Parser
 
   def current_command
     return @lines[@current_line].chomp.strip
+  end
+
+  private
+  def is_statement?
+    contains_comment = (current_command[0] == "/" && current_command[1] == "/")
+    is_empty = current_command == ""
+
+    (contains_comment || is_empty) ? false : true
   end
 end

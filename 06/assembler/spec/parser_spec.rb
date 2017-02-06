@@ -36,11 +36,29 @@ describe 'Parser' do
       parser.advance
       expect(parser.has_more_commands?).to be_falsey
     end
+
+    it 'returns false if remaining lines are comments or empty' do
+      parser = get_parser([C_COMMAND, A_COMMAND, BLANK_LINE, COMMENT, BLANK_LINE])
+
+      expect(parser.has_more_commands?).to be_truthy
+      parser.advance
+      expect(parser.has_more_commands?).to be_falsey
+    end
   end
 
   describe '#advance' do
     it 'moves to the next command' do
       parser = get_parser([A_COMMAND, C_COMMAND, L_COMMAND])
+
+      expect(parser.command_type).to eq(:a_command)
+      parser.advance
+      expect(parser.command_type).to eq(:c_command)
+      parser.advance
+      expect(parser.command_type).to eq(:l_command)
+    end
+
+    it 'moves skips comments and empty lines' do
+      parser = get_parser([A_COMMAND, COMMENT, BLANK_LINE, COMMENT, C_COMMAND, L_COMMAND])
 
       expect(parser.command_type).to eq(:a_command)
       parser.advance
