@@ -1,4 +1,6 @@
 class Assembler
+  NEW_LINE = "\n"
+
   def initialize(in_file, out_file, parser_klass)
     @in_file = in_file
     @out_file = out_file
