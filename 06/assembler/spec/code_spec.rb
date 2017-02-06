@@ -1,5 +1,4 @@
 require 'spec_helper'
-require_relative '../lib/code'
 
 DEST_CODES = {
   nil => "000",

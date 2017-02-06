@@ -1,5 +1,4 @@
 require 'spec_helper'
-require_relative '../lib/parser'
 
 C_COMMAND = "D=D+1;JEQ\n"
 A_COMMAND = "@ABC\n"

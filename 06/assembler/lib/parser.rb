@@ -1,6 +1,7 @@
 class Parser
   def initialize(file)
     @file = file
+    @file.rewind
     @lines = file.readlines
     @current_line = 0
 
