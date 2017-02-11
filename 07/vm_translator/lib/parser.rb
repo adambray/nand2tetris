@@ -26,13 +26,27 @@ class Parser
   end
 
   def command_type
-    if current_command == "add" || current_command == "sub"
-      return :C_ARITHMATIC
+    if current_command == 'add' || current_command == 'sub'
+      :C_ARITHMATIC
+    elsif current_command.split(' ').first == 'push'
+      :C_PUSH
     end
   end
 
   def arg1
-    return current_command.split(" ").first
+    case command_type
+    when :C_ARITHMATIC
+      current_command.split(' ').first
+    when :C_PUSH
+      current_command.split(' ')[1]
+    end
+  end
+
+  def arg2
+    case command_type
+    when :C_PUSH
+      current_command.split(' ')[2]
+    end
   end
 
   def current_command

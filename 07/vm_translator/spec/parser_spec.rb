@@ -1,11 +1,12 @@
 require_relative 'spec_helper'
 
-BLANK_LINE = "\n".freeze
-COMMENT = '// SOME COMMENT'.freeze
-ADD = 'add'.freeze
-SUB = 'sub'.freeze
-
 describe 'Parser' do
+  BLANK_LINE = "\n".freeze
+  COMMENT = '// SOME COMMENT'.freeze
+  ADD = 'add'.freeze
+  SUB = 'sub'.freeze
+  PUSH_5 = 'push constant 5'.freeze
+
   it 'can be constructed with an IO Object' do
     parser = Parser.new(StringIO.new(''))
   end
@@ -58,6 +59,20 @@ describe 'Parser' do
       parser.advance
       expect(parser.arg1).to eq('sub')
     end
+
+    it 'returns the correct argument for push commands' do
+      parser = get_parser([PUSH_5])
+
+      expect(parser.arg1).to eq("constant")
+    end
+  end
+
+  describe '#arg2' do
+    it 'returns the correct arg for push commands' do
+      parser = get_parser([PUSH_5])
+
+      expect(parser.arg2).to eq("5")
+    end
   end
 
   describe '#command_type' do
@@ -66,9 +81,16 @@ describe 'Parser' do
 
       expect(parser.command_type).to eq(:C_ARITHMATIC)
       parser.advance
-      expect(parser.command_type).to eq(:C_ARITHMATIC)      
+      expect(parser.command_type).to eq(:C_ARITHMATIC)
+    end
+
+    it 'returns :C_PUSH for push commands' do
+      parser = get_parser([PUSH_5])
+
+      expect(parser.command_type).to eq(:C_PUSH)
     end
   end
+
 
 end
 
