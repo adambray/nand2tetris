@@ -26,7 +26,8 @@ class Parser
   end
 
   def command_type
-    if current_command == 'add' || current_command == 'sub'
+    arithmatic_commands = ['add', 'sub', 'neg', 'eq', 'lt', 'gt', 'and', 'or', 'not']
+    if arithmatic_commands.include?(current_command)
       :C_ARITHMATIC
     elsif current_command.split(' ').first == 'push'
       :C_PUSH

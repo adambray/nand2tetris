@@ -6,7 +6,7 @@ class VMTranslator
     @in_file = in_file
     @out_file = out_file
     @parser = parser_klass.new(@in_file)
-    @code_generator = code_generator
+    @code_generator = code_generator.new
   end
 
   def translate
