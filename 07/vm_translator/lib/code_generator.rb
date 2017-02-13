@@ -179,6 +179,24 @@ class CodeGenerator
   M=D
   POP_TEMP
 
+  PUSH_POINTER = <<~PUSH_POINTER
+  @POINTER
+  D=M
+  @SP
+  A=M
+  M=D
+  @SP
+  M=M+1
+  PUSH_POINTER
+
+  POP_POINTER = <<~POP_POINTER
+  @SP
+  AM=M-1
+  D=M
+  @POINTER
+  M=D
+  POP_POINTER
+
   def initialize
     @count = 0
   end
@@ -212,6 +230,8 @@ class CodeGenerator
                         "this" => "THIS",
                         "that" => "THAT"}
     temp_index = (5 + index.to_i).to_s
+    pointer_vals = { "0" => "THIS", "1" => "THAT"}
+
     if type == :C_PUSH && segment == "constant"
       return PUSH_CONSTANT.gsub('VALUE', index)
     elsif type == :C_PUSH && simple_segments.keys.include?(segment)
@@ -222,6 +242,10 @@ class CodeGenerator
       return POP_LOCAL.gsub('SEGMENT', simple_segments[segment]).gsub('VALUE', index)
     elsif type == :C_POP && segment == 'temp'
       return POP_TEMP.gsub('ADDRESS', temp_index)
+    elsif type == :C_PUSH && segment == 'pointer'
+      return PUSH_POINTER.gsub('POINTER', pointer_vals[index])
+    elsif type == :C_POP && segment == 'pointer'
+      return POP_POINTER.gsub('POINTER', pointer_vals[index])
     end
   end
 
