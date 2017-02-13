@@ -31,6 +31,8 @@ class Parser
       :C_ARITHMATIC
     elsif current_command.split(' ').first == 'push'
       :C_PUSH
+    elsif current_command.split(' ').first == 'pop'
+      :C_POP
     end
   end
 
@@ -40,12 +42,16 @@ class Parser
       current_command.split(' ').first
     when :C_PUSH
       current_command.split(' ')[1]
+    when :C_POP
+      current_command.split(' ')[1]
     end
   end
 
   def arg2
     case command_type
     when :C_PUSH
+      current_command.split(' ')[2]
+    when :C_POP
       current_command.split(' ')[2]
     end
   end

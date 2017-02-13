@@ -16,8 +16,9 @@ class VMTranslator
         @out_file << code_generator.get_arithmatic(parser.arg1) << NEW_LINE
       elsif command_type == :C_PUSH
         @out_file << code_generator.get_push_pop(:C_PUSH, parser.arg1, parser.arg2) << NEW_LINE
+      elsif command_type == :C_POP
+        @out_file << code_generator.get_push_pop(:C_POP, parser.arg1, parser.arg2) << NEW_LINE
       end
-
       break if !parser.has_more_commands?
       parser.advance
     end

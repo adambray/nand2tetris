@@ -129,6 +129,56 @@ class CodeGenerator
   M=M+1
   PC
 
+  PUSH_LOCAL = <<~PUSH_LOCAL
+  // push SEGMENT VALUE
+  @VALUE
+  D=A
+  @SEGMENT
+  A=M+D
+  D=M
+  @SP
+  A=M
+  M=D
+  @SP
+  M=M+1
+  PUSH_LOCAL
+
+  POP_LOCAL = <<~POP_LOCAL
+  // pop SEGMENT VALUE
+  @VALUE
+  D=A
+  @SEGMENT
+  D=M+D
+  @R14
+  M=D
+  @SP
+  AM=M-1
+  D=M
+  @R14
+  A=M
+  M=D
+  POP_LOCAL
+
+  PUSH_TEMP = <<~PUSH_TEMP
+  // push temp ADDRESS
+  @ADDRESS
+  D=M
+  @SP
+  A=M
+  M=D
+  @SP
+  M=M+1
+  PUSH_TEMP
+
+  POP_TEMP = <<~POP_TEMP
+  // pop temp ADDRESS
+  @SP
+  AM=M-1
+  D=M
+  @ADDRESS
+  M=D
+  POP_TEMP
+
   def initialize
     @count = 0
   end
@@ -148,38 +198,40 @@ class CodeGenerator
     when "not"
       NOT
     when "eq"
-      write_eq
+      write_comp("eq")
     when "lt"
-      write_lt
+      write_comp("lt")
     when "gt"
-      write_gt
+      write_comp("gt")
     end
   end
 
   def get_push_pop(type, segment, index)
+    simple_segments = { "local" => "LCL",
+                        "argument" => "ARG",
+                        "this" => "THIS",
+                        "that" => "THAT"}
+    temp_index = (5 + index.to_i).to_s
     if type == :C_PUSH && segment == "constant"
       return PUSH_CONSTANT.gsub('VALUE', index)
+    elsif type == :C_PUSH && simple_segments.keys.include?(segment)
+      return PUSH_LOCAL.gsub('SEGMENT', simple_segments[segment]).gsub('VALUE', index)
+    elsif type == :C_PUSH && segment == 'temp'
+      return PUSH_TEMP.gsub('ADDRESS', temp_index)
+    elsif type == :C_POP && simple_segments.keys.include?(segment)
+      return POP_LOCAL.gsub('SEGMENT', simple_segments[segment]).gsub('VALUE', index)
+    elsif type == :C_POP && segment == 'temp'
+      return POP_TEMP.gsub('ADDRESS', temp_index)
     end
   end
 
   private
-  def write_eq
+  def write_comp(type)
     count = get_count
-    EQ
-      .gsub("WRITE_TRUE", "WRITE_TRUE.#{count}")
-      .gsub("CONTINUE", "CONTINUE.#{count}")
-  end
+    comps = {"eq" => EQ, "lt" => LT, "gt" => GT}
+    code = comps[type]
 
-  def write_lt
-    count = get_count
-    LT
-      .gsub("WRITE_TRUE", "WRITE_TRUE.#{count}")
-      .gsub("CONTINUE", "CONTINUE.#{count}")
-  end
-
-  def write_gt
-    count = get_count
-    GT
+    code
       .gsub("WRITE_TRUE", "WRITE_TRUE.#{count}")
       .gsub("CONTINUE", "CONTINUE.#{count}")
   end
